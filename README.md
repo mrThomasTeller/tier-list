@@ -2,7 +2,7 @@
 
 Минималистичное веб-приложение для составления тир-листов (S, A, B, C, D). Один HTML-файл, без зависимостей и сборки.
 
-> Это приложение полностью сделано с помощью [Claude Code](https://claude.com/claude-code) на модели **Claude Opus 4.7**.
+> Это приложение сделано с помощью [Claude Code](https://claude.com/claude-code) на модели **Claude Opus 4.7**.
 
 **Демо:** https://mrThomasTeller.github.io/tier-list/
 
