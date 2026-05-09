@@ -31,9 +31,9 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #1a1a1f;
-      --bg-alt: #0f0f14;
+      --bg-alt: #0a0a0e;
       --bg-panel: #16161c;
-      --bg-tier: #1c1c24;
+      --bg-tier: #2a2a36;
       --bg-item: #4a4a5e;
       --bg-btn: #2a2a38;
       --bg-btn-hover: #353548;
@@ -387,18 +387,23 @@
       <button class="btn" data-ratio="50">50/50</button>
       <button class="btn" data-ratio="70">70/30</button>
     </div>
-    <button class="btn btn-icon" id="btn-add" title="Добавить элемент" aria-label="Добавить элемент">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-    </button>
-    <button class="btn btn-icon" id="btn-import" title="Импорт" aria-label="Импорт">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-    </button>
-    <button class="btn btn-icon" id="btn-export" title="Экспорт (Markdown)" aria-label="Экспорт">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
-    </button>
-    <button class="btn btn-icon" id="btn-reset" title="Сброс" aria-label="Сброс">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
-    </button>
+    <div class="btn-group">
+      <button class="btn btn-icon" id="btn-add" title="Добавить элемент" aria-label="Добавить элемент">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button class="btn btn-icon" id="btn-import" title="Импорт" aria-label="Импорт">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+      </button>
+      <button class="btn btn-icon" id="btn-export" title="Экспорт (Markdown)" aria-label="Экспорт">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+      </button>
+      <button class="btn btn-icon" id="btn-reset" title="Сброс" aria-label="Сброс">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      </button>
+      <button class="btn btn-icon" id="btn-settings" title="Настройки" aria-label="Настройки">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
   </div>
 
 <script>
@@ -406,7 +411,19 @@
 
 const TIERS = ['S', 'A', 'B', 'C', 'D'];
 const STORAGE_KEY = 'tier-list-state-v1';
+const SETTINGS_KEY = 'tier-list-settings-v1';
 const isTouch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+function saveSettings(s) {
+  try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch {}
+}
+let settings = loadSettings();
 
 let state = load() || { items: [], nextId: 1, ratio: 50 };
 if (typeof state.ratio !== 'number') state.ratio = 50;
@@ -520,6 +537,66 @@ function setupDropZones() {
   });
 }
 
+async function fetchEmojisFor(names) {
+  const key = settings.openaiKey;
+  if (!key || !names.length) return {};
+  const sys = 'Подбираешь один наиболее подходящий emoji к каждому названию. Отвечай строго JSON-объектом вида {"name": "emoji"}: ключи — точные исходные строки, значения — ровно один emoji-символ. Без префиксов, пояснений и markdown.';
+  const user = JSON.stringify(names);
+  const body = {
+    model: 'gpt-4o-mini',
+    messages: [
+      { role: 'system', content: sys },
+      { role: 'user', content: user }
+    ],
+    response_format: { type: 'json_object' },
+    temperature: 0.3
+  };
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error('OpenAI ' + res.status + ': ' + (await res.text()).slice(0, 200));
+  const data = await res.json();
+  const txt = data.choices?.[0]?.message?.content || '{}';
+  try { return JSON.parse(txt); } catch { return {}; }
+}
+
+function showSettingsModal() {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal">
+      <h2>Настройки</h2>
+      <p>OpenAI API-ключ для автоподбора emoji при импорте. Ключ хранится только в localStorage этого браузера.</p>
+      <input id="set-key" type="password" placeholder="sk-..." autocomplete="off">
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;">
+        <input id="set-emoji" type="checkbox"> Подставлять emoji автоматически при импорте
+      </label>
+      <div class="modal-actions">
+        <button class="btn" data-act="cancel">Отмена</button>
+        <button class="btn btn-primary" data-act="save">Сохранить</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+  const keyInput = backdrop.querySelector('#set-key');
+  const emojiCb = backdrop.querySelector('#set-emoji');
+  keyInput.value = settings.openaiKey || '';
+  emojiCb.checked = settings.autoEmoji !== false;
+  keyInput.focus();
+
+  const close = () => backdrop.remove();
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+  backdrop.querySelector('[data-act="cancel"]').onclick = close;
+  backdrop.querySelector('[data-act="save"]').onclick = () => {
+    settings.openaiKey = keyInput.value.trim();
+    settings.autoEmoji = emojiCb.checked;
+    saveSettings(settings);
+    close();
+  };
+}
+
 function showImportModal() {
   const backdrop = document.createElement('div');
   backdrop.className = 'modal-backdrop';
@@ -541,16 +618,33 @@ function showImportModal() {
   backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
   backdrop.querySelector('[data-act="cancel"]').onclick = close;
 
-  const apply = (mode) => {
+  const apply = async (mode) => {
     const text = backdrop.querySelector('#import-text').value;
     const names = text
       .split('\n')
       .map(s => s.replace(/^\s*(?:[-*+]\s+\[[ xX]\]|[-*+]|\d+[.)])\s+/, '').trim())
       .filter(Boolean);
     if (!names.length) { close(); return; }
+
+    const useEmoji = settings.autoEmoji !== false && settings.openaiKey;
+    const addBtn = backdrop.querySelector('[data-act="add"]');
+    const replaceBtn = backdrop.querySelector('[data-act="replace"]');
+    if (useEmoji) {
+      addBtn.disabled = replaceBtn.disabled = true;
+      addBtn.textContent = replaceBtn.textContent = '...';
+    }
+
+    let emojiMap = {};
+    if (useEmoji) {
+      try { emojiMap = await fetchEmojisFor(names); }
+      catch (e) { console.warn('emoji fetch failed', e); }
+    }
+
     if (mode === 'replace') state.items = [];
     for (const name of names) {
-      state.items.push({ id: state.nextId++, name, tier: null });
+      const e = emojiMap[name];
+      const finalName = e && /\p{Extended_Pictographic}/u.test(e) ? `${e} ${name}` : name;
+      state.items.push({ id: state.nextId++, name: finalName, tier: null });
     }
     render();
     close();
@@ -631,17 +725,34 @@ function showAddModal() {
   input.focus();
 
   const close = () => backdrop.remove();
-  const submit = () => {
+  const submitBtn = backdrop.querySelector('[data-act="add"]');
+  const submit = async () => {
     const name = input.value.trim();
     if (!name) { close(); return; }
-    state.items.push({ id: state.nextId++, name, tier: null });
+
+    const useEmoji = settings.autoEmoji !== false && settings.openaiKey;
+    let finalName = name;
+    if (useEmoji) {
+      submitBtn.disabled = true;
+      const oldText = submitBtn.textContent;
+      submitBtn.textContent = '...';
+      try {
+        const map = await fetchEmojisFor([name]);
+        const e = map[name];
+        if (e && /\p{Extended_Pictographic}/u.test(e)) finalName = `${e} ${name}`;
+      } catch (err) { console.warn('emoji fetch failed', err); }
+      submitBtn.disabled = false;
+      submitBtn.textContent = oldText;
+    }
+
+    state.items.push({ id: state.nextId++, name: finalName, tier: null });
     render();
     close();
   };
 
   backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
   backdrop.querySelector('[data-act="cancel"]').onclick = close;
-  backdrop.querySelector('[data-act="add"]').onclick = submit;
+  submitBtn.onclick = submit;
   input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
 }
 
@@ -661,6 +772,7 @@ document.querySelectorAll('#ratio-group .btn').forEach(b => {
 applyRatio();
 
 document.getElementById('btn-add').onclick = showAddModal;
+document.getElementById('btn-settings').onclick = showSettingsModal;
 document.getElementById('btn-import').onclick = showImportModal;
 document.getElementById('btn-export').onclick = showExportModal;
 document.getElementById('btn-reset').onclick = () => {
