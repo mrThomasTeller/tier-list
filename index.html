@@ -543,7 +543,10 @@ function showImportModal() {
 
   const apply = (mode) => {
     const text = backdrop.querySelector('#import-text').value;
-    const names = text.split('\n').map(s => s.trim()).filter(Boolean);
+    const names = text
+      .split('\n')
+      .map(s => s.replace(/^\s*(?:[-*+]\s+\[[ xX]\]|[-*+]|\d+[.)])\s+/, '').trim())
+      .filter(Boolean);
     if (!names.length) { close(); return; }
     if (mode === 'replace') state.items = [];
     for (const name of names) {
