@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Tier List</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --bg-alt: #f4f4f7;
+    --bg-panel: #fafafc;
+    --bg-tier: #eef0f4;
+    --bg-item: #ffffff;
+    --bg-btn: #eceef2;
+    --bg-btn-hover: #dde0e6;
+    --bg-btn-active: #ccd0d8;
+    --bg-input: #ffffff;
+    --border: #d8dae0;
+    --border-strong: #c0c4cc;
+    --text: #1a1a1f;
+    --text-muted: #6a6a76;
+    --text-on-tier: #1a1a1f;
+    --primary: #4a6cf7;
+    --primary-hover: #5a7cff;
+    --primary-text: #ffffff;
+    --divider: #d8dae0;
+    --shadow: 0 1px 2px rgba(0,0,0,0.04);
+    --backdrop: rgba(0,0,0,0.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1a1f;
+      --bg-alt: #0f0f14;
+      --bg-panel: #16161c;
+      --bg-tier: #1c1c24;
+      --bg-item: #2d2d3a;
+      --bg-btn: #2a2a38;
+      --bg-btn-hover: #353548;
+      --bg-btn-active: #404058;
+      --bg-input: #0f0f14;
+      --border: #3a3a48;
+      --border-strong: #4a4a5a;
+      --text: #e8e8ec;
+      --text-muted: #888894;
+      --text-on-tier: #1a1a1f;
+      --primary: #4a6cf7;
+      --primary-hover: #5a7cff;
+      --primary-text: #ffffff;
+      --divider: #2a2a35;
+      --shadow: none;
+      --backdrop: rgba(0,0,0,0.6);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  body {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  body { display: flex; flex-direction: column; }
+  .main { order: 1; }
+  .toolbar {
+    order: 0;
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+    padding: 8px 10px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--divider);
+    align-items: center;
+  }
+  .toolbar h1 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-right: auto;
+    letter-spacing: 0.3px;
+    color: var(--text);
+  }
+  .btn {
+    background: var(--bg-btn);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--bg-btn-hover); }
+  .btn:active { background: var(--bg-btn-active); }
+  .btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+  .btn-primary:hover { background: var(--primary-hover); }
+  .btn-danger { background: #d94a4a; border-color: #d94a4a; color: #ffffff; }
+  .btn-danger:hover { background: #e75a5a; }
+  .btn.active { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+  .btn.active:hover { background: var(--primary-hover); }
+  .btn-icon { padding: 6px 10px; display: inline-flex; align-items: center; justify-content: center; }
+  .btn-icon svg { width: 18px; height: 18px; display: block; }
+  .btn-group { display: flex; gap: 0; }
+  .btn-group .btn { border-radius: 0; padding-left: 8px; padding-right: 8px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; }
+  .btn-group .btn:first-child { border-radius: 6px 0 0 6px; }
+  .btn-group .btn:last-child { border-radius: 0 6px 6px 0; }
+  .btn-group .btn + .btn { border-left: none; }
+
+  .main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .tiers {
+    flex: 1 1 var(--tiers-ratio, 50%);
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px;
+    background: var(--bg-alt);
+  }
+
+  .divider {
+    flex: 0 0 auto;
+    height: 4px;
+    background: var(--divider);
+    cursor: ns-resize;
+  }
+
+  .pool {
+    flex: 1 1 calc(100% - var(--tiers-ratio, 50%));
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--divider);
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+  }
+
+  .tier {
+    display: flex;
+    margin-bottom: 4px;
+    background: var(--bg-tier);
+    border-radius: 6px;
+    overflow: hidden;
+    min-height: 56px;
+  }
+  .tier-label {
+    flex: 0 0 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--text-on-tier);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .tier[data-tier="S"] .tier-label { background: #ff7f7f; }
+  .tier[data-tier="A"] .tier-label { background: #ffbf7f; }
+  .tier[data-tier="B"] .tier-label { background: #ffdf7f; }
+  .tier[data-tier="C"] .tier-label { background: #bfff7f; }
+  .tier[data-tier="D"] .tier-label { background: #7fbfff; }
+
+  .tier-content {
+    flex: 1 1 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 6px;
+    padding: 6px;
+    min-height: 56px;
+  }
+  .tier-content.drag-over { background: var(--bg-btn-hover); }
+  .pool.drag-over { background: var(--bg-btn-hover); }
+
+  .item {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-item);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0 0 0 10px;
+    font-size: 13px;
+    height: 36px;
+    user-select: none;
+    cursor: grab;
+    max-width: 100%;
+    box-shadow: var(--shadow);
+  }
+  .item.dragging { opacity: 0.4; }
+  .item-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 160px;
+    margin-right: 6px;
+  }
+  .item-buttons {
+    display: flex;
+    gap: 1px;
+    margin-left: auto;
+    height: 100%;
+  }
+  .item-btn {
+    background: transparent;
+    border: none;
+    color: #1a1a1f;
+    font-size: 11px;
+    font-weight: 700;
+    width: 22px;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .item-btn:hover { filter: brightness(1.1); }
+  .item-btn[data-tier="S"] { background: #ff7f7f; }
+  .item-btn[data-tier="A"] { background: #ffbf7f; }
+  .item-btn[data-tier="B"] { background: #ffdf7f; }
+  .item-btn[data-tier="C"] { background: #bfff7f; }
+  .item-btn[data-tier="D"] { background: #7fbfff; }
+  .item-btn[data-tier="P"] { background: var(--bg-btn); color: var(--text); }
+  .item-btn[data-act="del"] { background: #d94a4a; color: #ffffff; font-size: 13px; }
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: var(--backdrop);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 16px;
+  }
+  .modal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--text);
+  }
+  .modal h2 { font-size: 16px; font-weight: 600; }
+  .modal p { color: var(--text-muted); }
+  .modal textarea, .modal input[type="text"] {
+    width: 100%;
+    background: var(--bg-input);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 13px;
+  }
+  .modal textarea {
+    height: 220px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    resize: vertical;
+  }
+  .modal pre {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 12px;
+    max-height: 320px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 600px) {
+    .toolbar h1 { display: none; }
+    .toolbar {
+      order: 2;
+      border-top: 1px solid var(--divider);
+      border-bottom: none;
+      padding: 6px;
+      padding-bottom: max(6px, env(safe-area-inset-bottom));
+      gap: 6px;
+      justify-content: space-around;
+    }
+    .btn { padding: 8px 10px; font-size: 13px; flex: 1 1 auto; }
+    .tier-label { flex-basis: 40px; font-size: 18px; }
+
+    .item {
+      flex-direction: column;
+      align-items: stretch;
+      height: auto;
+      padding: 0;
+      overflow: hidden;
+    }
+    .item-name {
+      max-width: none;
+      width: 100%;
+      padding: 6px 8px;
+      margin: 0;
+      white-space: normal;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .item-buttons {
+      width: 100%;
+      height: 36px;
+      margin: 0;
+      gap: 1px;
+    }
+    .item-btn { flex: 1 1 0; width: auto; height: 100%; font-size: 13px; }
+
+    .pool { gap: 8px; padding: 8px; flex-direction: column; flex-wrap: nowrap; }
+    .pool .item {
+      width: 100%;
+      flex: 0 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+    .pool .item .item-name { font-size: 14px; padding: 8px 10px; }
+    .pool .item .item-buttons { height: 40px; }
+
+    .tier-content {
+      gap: 0;
+      padding: 0;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: stretch;
+    }
+    .tiers .item {
+      width: 100%;
+      flex: 0 0 auto;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+      border-top: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .tiers .item:last-child { border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="main">
+    <div class="tiers" id="tiers">
+      <div class="tier" data-tier="S"><div class="tier-label">S</div><div class="tier-content" data-drop="S"></div></div>
+      <div class="tier" data-tier="A"><div class="tier-label">A</div><div class="tier-content" data-drop="A"></div></div>
+      <div class="tier" data-tier="B"><div class="tier-label">B</div><div class="tier-content" data-drop="B"></div></div>
+      <div class="tier" data-tier="C"><div class="tier-label">C</div><div class="tier-content" data-drop="C"></div></div>
+      <div class="tier" data-tier="D"><div class="tier-label">D</div><div class="tier-content" data-drop="D"></div></div>
+    </div>
+    <div class="pool" id="pool" data-drop="P"></div>
+  </div>
+
+  <div class="toolbar">
+    <h1>Tier List</h1>
+    <div class="btn-group" id="ratio-group">
+      <button class="btn" data-ratio="30">30/70</button>
+      <button class="btn" data-ratio="50">50/50</button>
+      <button class="btn" data-ratio="70">70/30</button>
+    </div>
+    <button class="btn btn-icon" id="btn-add" title="Добавить элемент" aria-label="Добавить элемент">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button class="btn btn-icon" id="btn-import" title="Импорт" aria-label="Импорт">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+    </button>
+    <button class="btn btn-icon" id="btn-export" title="Экспорт (Markdown)" aria-label="Экспорт">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
+    </button>
+    <button class="btn btn-icon" id="btn-reset" title="Сброс" aria-label="Сброс">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+    </button>
+  </div>
+
+<script>
+'use strict';
+
+const TIERS = ['S', 'A', 'B', 'C', 'D'];
+const STORAGE_KEY = 'tier-list-state-v1';
+const isTouch = matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+let state = load() || { items: [], nextId: 1, ratio: 50 };
+if (typeof state.ratio !== 'number') state.ratio = 50;
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+}
+
+function render() {
+  TIERS.forEach(t => {
+    document.querySelector(`[data-drop="${t}"]`).innerHTML = '';
+  });
+  document.getElementById('pool').innerHTML = '';
+
+  for (const item of state.items) {
+    const el = makeItemEl(item);
+    const target = item.tier
+      ? document.querySelector(`[data-drop="${item.tier}"]`)
+      : document.getElementById('pool');
+    target.appendChild(el);
+  }
+  save();
+}
+
+function makeItemEl(item) {
+  const el = document.createElement('div');
+  el.className = 'item';
+  el.dataset.id = item.id;
+  el.draggable = !isTouch;
+
+  const name = document.createElement('span');
+  name.className = 'item-name';
+  name.textContent = item.name;
+  el.appendChild(name);
+
+  const buttons = document.createElement('div');
+  buttons.className = 'item-buttons';
+  for (const t of TIERS) {
+    const b = document.createElement('button');
+    b.className = 'item-btn';
+    b.dataset.tier = t;
+    b.textContent = t;
+    b.title = `В ${t}`;
+    b.addEventListener('click', e => { e.stopPropagation(); moveItem(item.id, t); });
+    buttons.appendChild(b);
+  }
+  const pb = document.createElement('button');
+  pb.className = 'item-btn';
+  pb.dataset.tier = 'P';
+  pb.textContent = '↓';
+  pb.title = 'В пул';
+  pb.addEventListener('click', e => { e.stopPropagation(); moveItem(item.id, null); });
+  buttons.appendChild(pb);
+
+  const db = document.createElement('button');
+  db.className = 'item-btn';
+  db.dataset.act = 'del';
+  db.textContent = '×';
+  db.title = 'Удалить';
+  db.addEventListener('click', e => { e.stopPropagation(); deleteItem(item.id); });
+  buttons.appendChild(db);
+  el.appendChild(buttons);
+
+  if (!isTouch) {
+    el.addEventListener('dragstart', e => {
+      el.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(item.id));
+    });
+    el.addEventListener('dragend', () => el.classList.remove('dragging'));
+  }
+  return el;
+}
+
+function moveItem(id, tier) {
+  const it = state.items.find(i => i.id === id);
+  if (!it) return;
+  it.tier = tier;
+  render();
+}
+
+function deleteItem(id) {
+  state.items = state.items.filter(i => i.id !== id);
+  render();
+}
+
+function setupDropZones() {
+  if (isTouch) return;
+  document.querySelectorAll('[data-drop]').forEach(zone => {
+    zone.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      zone.classList.add('drag-over');
+    });
+    zone.addEventListener('dragleave', e => {
+      if (e.target === zone) zone.classList.remove('drag-over');
+    });
+    zone.addEventListener('drop', e => {
+      e.preventDefault();
+      zone.classList.remove('drag-over');
+      const id = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      const target = zone.dataset.drop;
+      moveItem(id, target === 'P' ? null : target);
+    });
+  });
+}
+
+function showImportModal() {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal">
+      <h2>Импорт элементов</h2>
+      <p style="font-size: 12px; color: #999;">По одному элементу на строку</p>
+      <textarea id="import-text" autofocus placeholder="Элемент 1&#10;Элемент 2&#10;Элемент 3"></textarea>
+      <div class="modal-actions">
+        <button class="btn" data-act="cancel">Отмена</button>
+        <button class="btn" data-act="add">Добавить</button>
+        <button class="btn btn-primary" data-act="replace">Заменить</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+
+  const close = () => backdrop.remove();
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+  backdrop.querySelector('[data-act="cancel"]').onclick = close;
+
+  const apply = (mode) => {
+    const text = backdrop.querySelector('#import-text').value;
+    const names = text.split('\n').map(s => s.trim()).filter(Boolean);
+    if (!names.length) { close(); return; }
+    if (mode === 'replace') state.items = [];
+    for (const name of names) {
+      state.items.push({ id: state.nextId++, name, tier: null });
+    }
+    render();
+    close();
+  };
+  backdrop.querySelector('[data-act="add"]').onclick = () => apply('add');
+  backdrop.querySelector('[data-act="replace"]').onclick = () => apply('replace');
+}
+
+function showExportModal() {
+  const md = buildMarkdown();
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal">
+      <h2>Экспорт (Markdown)</h2>
+      <pre id="export-text"></pre>
+      <div class="modal-actions">
+        <button class="btn" data-act="copy">Копировать</button>
+        <button class="btn btn-primary" data-act="close">Закрыть</button>
+      </div>
+    </div>
+  `;
+  backdrop.querySelector('#export-text').textContent = md;
+  document.body.appendChild(backdrop);
+
+  const close = () => backdrop.remove();
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+  backdrop.querySelector('[data-act="close"]').onclick = close;
+  backdrop.querySelector('[data-act="copy"]').onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(md);
+      const btn = backdrop.querySelector('[data-act="copy"]');
+      const old = btn.textContent;
+      btn.textContent = 'Скопировано';
+      setTimeout(() => { btn.textContent = old; }, 1200);
+    } catch {
+      alert('Не удалось скопировать');
+    }
+  };
+}
+
+function buildMarkdown() {
+  const out = ['# Tier List', ''];
+  for (const t of TIERS) {
+    const items = state.items.filter(i => i.tier === t);
+    out.push(`## ${t}`);
+    if (items.length) {
+      for (const it of items) out.push(`- ${it.name}`);
+    } else {
+      out.push('_(пусто)_');
+    }
+    out.push('');
+  }
+  const unranked = state.items.filter(i => !i.tier);
+  if (unranked.length) {
+    out.push('## Не отсортировано');
+    for (const it of unranked) out.push(`- ${it.name}`);
+  }
+  return out.join('\n');
+}
+
+function showAddModal() {
+  const backdrop = document.createElement('div');
+  backdrop.className = 'modal-backdrop';
+  backdrop.innerHTML = `
+    <div class="modal">
+      <h2>Новый элемент</h2>
+      <input id="add-name" type="text" placeholder="Название" style="background:#0f0f14;color:#e8e8ec;border:1px solid #3a3a48;border-radius:6px;padding:10px;font-size:14px;width:100%;">
+      <div class="modal-actions">
+        <button class="btn" data-act="cancel">Отмена</button>
+        <button class="btn btn-primary" data-act="add">Добавить</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(backdrop);
+
+  const input = backdrop.querySelector('#add-name');
+  input.focus();
+
+  const close = () => backdrop.remove();
+  const submit = () => {
+    const name = input.value.trim();
+    if (!name) { close(); return; }
+    state.items.push({ id: state.nextId++, name, tier: null });
+    render();
+    close();
+  };
+
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+  backdrop.querySelector('[data-act="cancel"]').onclick = close;
+  backdrop.querySelector('[data-act="add"]').onclick = submit;
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+}
+
+function applyRatio() {
+  document.documentElement.style.setProperty('--tiers-ratio', state.ratio + '%');
+  document.querySelectorAll('#ratio-group .btn').forEach(b => {
+    b.classList.toggle('active', Number(b.dataset.ratio) === state.ratio);
+  });
+}
+document.querySelectorAll('#ratio-group .btn').forEach(b => {
+  b.onclick = () => {
+    state.ratio = Number(b.dataset.ratio);
+    applyRatio();
+    save();
+  };
+});
+applyRatio();
+
+document.getElementById('btn-add').onclick = showAddModal;
+document.getElementById('btn-import').onclick = showImportModal;
+document.getElementById('btn-export').onclick = showExportModal;
+document.getElementById('btn-reset').onclick = () => {
+  if (!state.items.length) return;
+  if (confirm('Сбросить все распределения по тирам?')) {
+    state.items.forEach(i => i.tier = null);
+    render();
+  }
+};
+
+setupDropZones();
+render();
+</script>
+</body>
+</html>
